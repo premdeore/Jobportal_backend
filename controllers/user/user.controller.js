@@ -176,28 +176,3 @@ export const updateProfile = async (req,res)=>{
         console.log(error , "error");
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-// const UserModel = require('../../models/User')
-
-
-// class userController {
-//     static userRegistration = async(req , res)=>{
-//     const { name , email , password , roles} = req.body;
-
-//         return res.send({ 'status': "Success", "message": "Successfully Register" });
-//     }
-// }
-
-// module.exports = {
-//     userController
-// }
