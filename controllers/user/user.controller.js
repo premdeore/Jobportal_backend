@@ -1,6 +1,8 @@
 import {User} from "../../models/user.model.js"
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import getDataUri from "../../utils/datauri.js";
+import cloudinary from "../../utils/cloudinary.js";
 
 export const register = async (req,res)=>{
     try {
@@ -84,7 +86,6 @@ export const login = async (req, res)=>{
         };
 
         const token = await jwt.sign(tokenData, process.env.SECRET_KEY,{expiresIn:'1d'})
-    //    console.log(token)
         user = {
             _id:user._id,
             fullname: user.fullname,
@@ -131,8 +132,9 @@ export const updateProfile = async (req,res)=>{
         //         success: false
         //     });
         // };
+        const fileUri = getDataUri(file);
+        const cloudResponse = await cloudinary.uploader.upload(fileUri.content);
 
-        //cloudinary
         let skillsArray
         if(skills){
             skillsArray = skills.split(",");
@@ -152,8 +154,13 @@ export const updateProfile = async (req,res)=>{
         if(fullname) user.fullname = fullname
         if(email) user.email = email
         if(phoneNumber) user.phoneNumber = phoneNumber
-        if(bio) user.bio = bio
+        if(bio) user.profile.bio = bio
         if(skills) user.profile.skills = skillsArray
+         
+        if(cloudResponse){
+            user.profile.resume = cloudResponse.secure_url;  // save the cloudinary url
+            user.profile.resumeOriginalName = file.originalname // save the original file name
+        }
 
         await user.save();
 
@@ -174,5 +181,9 @@ export const updateProfile = async (req,res)=>{
 
     } catch (error) {
         console.log(error , "error");
+        return res.status(400).json({
+            message: `${error}`,
+            success: false
+        })
     }
 }
