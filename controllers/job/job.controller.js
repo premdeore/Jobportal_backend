@@ -71,7 +71,9 @@ export const getAllJobs = async(req, res)=>{
 export const getJobById = async(req, res)=>{
     try {
         const jobId = req.params.id;
-        const job = await Job.findById(jobId);
+        const job = await Job.findById(jobId).populate({
+            path:"applications"
+        });
 
         if(!job){
             return res.status(404).json({
@@ -80,11 +82,10 @@ export const getJobById = async(req, res)=>{
             });
         };
 
-        const application = await Application.findOne({ job: jobId, applicant: req.id });
+        // const application = await Application.findOne({ job: jobId, applicant: req.id });
 
         return res.status(200).json({
             job,
-            isApplied: !!application,
             success: true
         });
 
