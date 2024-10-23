@@ -1,3 +1,4 @@
+import { Application } from "../../models/application.model.js";
 import { Job } from "../../models/job.model.js";
 
 
@@ -79,8 +80,11 @@ export const getJobById = async(req, res)=>{
             });
         };
 
+        const application = await Application.findOne({ job: jobId, applicant: req.id });
+
         return res.status(200).json({
             job,
+            isApplied: !!application,
             success: true
         });
 
